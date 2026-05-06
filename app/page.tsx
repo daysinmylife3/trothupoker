@@ -70,6 +70,13 @@ export default function Home() {
     setView('history');
   };
 
+  const handleDeleteHistory = (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa trận đấu này?')) return;
+    const newHistory = history.filter(g => g.id !== id);
+    setHistory(newHistory);
+    storage.saveHistory(newHistory);
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-10 shadow-sm">
@@ -142,7 +149,7 @@ export default function Home() {
         )}
 
         {view === 'history' && (
-          <MatchHistory history={history} />
+          <MatchHistory history={history} onDelete={handleDeleteHistory} />
         )}
       </main>
 

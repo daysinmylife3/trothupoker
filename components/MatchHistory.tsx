@@ -2,13 +2,15 @@
 
 import { Game } from '../types/poker';
 import { Card } from './ui';
-import { History, Calendar, Trophy, TrendingDown, TrendingUp } from 'lucide-react';
+import { History, Calendar, Trophy, TrendingDown, TrendingUp, Trash2 } from 'lucide-react';
+import { Button } from './ui';
 
 interface MatchHistoryProps {
   history: Game[];
+  onDelete: (id: string) => void;
 }
 
-export function MatchHistory({ history }: MatchHistoryProps) {
+export function MatchHistory({ history, onDelete }: MatchHistoryProps) {
   const sortedHistory = [...history].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -24,13 +26,23 @@ export function MatchHistory({ history }: MatchHistoryProps) {
         {sortedHistory.map((game) => (
           <Card key={game.id} className="overflow-hidden border-zinc-300">
             <div className="bg-zinc-100 px-4 py-2 border-b border-zinc-300 flex justify-between items-center">
-              <div className="flex items-center gap-2 text-sm font-bold text-zinc-800">
-                <Calendar className="w-4 h-4" />
-                {new Date(game.date).toLocaleDateString('vi-VN')} lúc {new Date(game.date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm font-bold text-zinc-800">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(game.date).toLocaleDateString('vi-VN')} lúc {new Date(game.date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <div className="text-sm font-black text-zinc-950">
+                  Tổng gà: {game.players.reduce((sum, p) => sum + p.buyIn, 0)}
+                </div>
               </div>
-              <div className="text-sm font-black text-zinc-950">
-                Tổng gà: {game.players.reduce((sum, p) => sum + p.buyIn, 0)}
-              </div>
+              
+              <button 
+                onClick={() => onDelete(game.id)}
+                className="text-zinc-400 hover:text-red-600 transition-colors p-1"
+                title="Xóa trận đấu"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
             </div>
             
             <div className="p-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

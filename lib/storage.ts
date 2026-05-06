@@ -20,6 +20,13 @@ export const storage = {
   saveHistory: (history: Game[]) => {
     Cookies.set(HISTORY_KEY, JSON.stringify(history), { expires: 365 });
   },
+  deleteHistoryItem: (id: string) => {
+    const data = Cookies.get(HISTORY_KEY);
+    if (!data) return;
+    const history: Game[] = JSON.parse(data);
+    const updated = history.filter(g => g.id !== id);
+    Cookies.set(HISTORY_KEY, JSON.stringify(updated), { expires: 365 });
+  },
   getActiveGame: (): Game | null => {
     const data = Cookies.get(ACTIVE_GAME_KEY);
     return data ? JSON.parse(data) : null;
