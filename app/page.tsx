@@ -8,7 +8,7 @@ import { GameSetup } from './../components/GameSetup';
 import { InGameTracker } from './../components/InGameTracker';
 import { Settlement } from './../components/Settlement';
 import { MatchHistory } from './../components/MatchHistory';
-import { Button } from './../components/ui';
+import { Button, cn } from './../components/ui';
 import { Users, Play, History as HistoryIcon, Spade } from 'lucide-react';
 
 export default function Home() {
