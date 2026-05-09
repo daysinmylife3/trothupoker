@@ -14,6 +14,7 @@ export interface Game {
   date: string;
   players: GamePlayer[];
   status: 'active' | 'settled';
+  chipValue?: number;
 }
 
 export type View = 'roster' | 'setup' | 'playing' | 'settlement' | 'history';

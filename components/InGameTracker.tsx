@@ -1,6 +1,6 @@
 'use client';
 
-import { Game, GamePlayer } from '../types/poker';
+import { Game } from '../types/poker';
 import { Button, Card, Input } from './ui';
 import { Plus, Minus, CheckCheck, Coins } from 'lucide-react';
 
@@ -13,7 +13,7 @@ interface InGameTrackerProps {
 export function InGameTracker({ game, onUpdate, onEnd }: InGameTrackerProps) {
   const updatePlayerBuyIn = (id: string, newBuyIn: number) => {
     const updatedPlayers = game.players.map(p => 
-      p.id === id ? { ...p, buyIn: Math.max(0, newBuyIn) } : p
+      p.id === id ? { ...p, buyIn: newBuyIn } : p
     );
     onUpdate({ ...game, players: updatedPlayers });
   };

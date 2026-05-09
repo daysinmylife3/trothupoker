@@ -77,6 +77,12 @@ export default function Home() {
     storage.saveHistory(newHistory);
   };
 
+  const handleUpdateHistory = (updatedGame: Game) => {
+    const newHistory = history.map(g => g.id === updatedGame.id ? updatedGame : g);
+    setHistory(newHistory);
+    storage.saveHistory(newHistory);
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-10 shadow-sm">
@@ -149,7 +155,11 @@ export default function Home() {
         )}
 
         {view === 'history' && (
-          <MatchHistory history={history} onDelete={handleDeleteHistory} />
+          <MatchHistory 
+            history={history} 
+            onDelete={handleDeleteHistory} 
+            onUpdate={handleUpdateHistory}
+          />
         )}
       </main>
 
