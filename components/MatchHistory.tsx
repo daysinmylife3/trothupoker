@@ -157,7 +157,12 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
                       <Input 
                         type="number"
                         value={editChipValue}
-                        onChange={(e) => setEditChipValue(parseInt(e.target.value) || 0)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') return setEditChipValue(0);
+                          const parsed = parseInt(val);
+                          if (!isNaN(parsed)) setEditChipValue(parsed);
+                        }}
                         className="h-8 w-32 font-black text-sm bg-white"
                       />
                       <span className="text-xs font-bold text-blue-800">VNĐ</span>
@@ -207,7 +212,12 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
                             <Input 
                               type="number"
                               value={profit}
-                              onChange={(e) => handleUpdateProfit(player.id, parseInt(e.target.value) || 0)}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === '') return handleUpdateProfit(player.id, 0);
+                                const parsed = parseInt(val);
+                                if (!isNaN(parsed)) handleUpdateProfit(player.id, parsed);
+                              }}
                               className="h-8 text-right font-black text-sm"
                             />
                           </div>

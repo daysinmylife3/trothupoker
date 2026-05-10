@@ -92,7 +92,12 @@ export function Settlement({ game, onBack, onSave }: SettlementProps) {
               <Input 
                 type="number"
                 value={chipValue}
-                onChange={(e) => setChipValue(parseInt(e.target.value) || 0)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '') return setChipValue(0);
+                  const parsed = parseInt(val);
+                  if (!isNaN(parsed)) setChipValue(parsed);
+                }}
                 className="font-black text-lg h-9 bg-white border-blue-300"
               />
               <span className="font-bold text-blue-800 text-sm whitespace-nowrap">VNĐ / Chip</span>
@@ -121,7 +126,12 @@ export function Settlement({ game, onBack, onSave }: SettlementProps) {
                   <Input 
                     type="number"
                     value={remaining}
-                    onChange={(e) => updateRemaining(player.id, parseInt(e.target.value) || 0)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '') return updateRemaining(player.id, 0);
+                      const parsed = parseInt(val);
+                      if (!isNaN(parsed)) updateRemaining(player.id, parsed);
+                    }}
                     className="font-black text-lg"
                   />
                 </div>

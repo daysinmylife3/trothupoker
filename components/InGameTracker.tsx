@@ -67,7 +67,12 @@ export function InGameTracker({ game, onUpdate, onEnd }: InGameTrackerProps) {
                 <Input 
                   type="number" 
                   value={player.buyIn}
-                  onChange={(e) => updatePlayerBuyIn(player.id, parseInt(e.target.value) || 0)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '') return updatePlayerBuyIn(player.id, 0);
+                    const parsed = parseInt(val);
+                    if (!isNaN(parsed)) updatePlayerBuyIn(player.id, parsed);
+                  }}
                   className="text-center font-black text-lg"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 text-[10px] uppercase font-black">Sửa</span>
