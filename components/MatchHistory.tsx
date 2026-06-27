@@ -14,7 +14,11 @@ import {
   Save, 
   X, 
   AlertCircle,
-  Banknote
+  Banknote,
+  Crown,
+  Medal,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface MatchHistoryProps {
@@ -27,6 +31,7 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editProfits, setEditProfits] = useState<Record<string, number>>({});
   const [editChipValue, setEditChipValue] = useState<number>(500);
+  const [showLeaderboard, setShowLeaderboard] = useState(true);
 
   const sortedHistory = [...history].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -74,12 +79,213 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value * chipValue);
   };
 
+  // Helper formatting functions for leaderboard
+  const formatChips = (val: number) => {
+    return val > 0 ? `+${val}` : `${val}`;
+  };
+
+  const getProfitColor = (val: number) => {
+    if (val > 0) return 'text-green-600';
+    if (val < 0) return 'text-red-600';
+    return 'text-zinc-500';
+  };
+
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  // Compute leaderboard from history
+  const leaderboard = Object.values(
+    history.reduce((acc, game) => {
+      game.players.forEach(p => {
+        if (!acc[p.id]) {
+          acc[p.id] = {
+            id: p.id,
+            name: p.name,
+            totalNetProfit: 0,
+            gamesPlayed: 0,
+          };
+        }
+        acc[p.id].totalNetProfit += (p.netProfit || 0);
+        acc[p.id].gamesPlayed += 1;
+        acc[p.id].name = p.name; // Keep name fresh
+      });
+      return acc;
+    }, {} as Record<string, { id: string; name: string; totalNetProfit: number; gamesPlayed: number }>)
+  ).sort((a, b) => b.totalNetProfit - a.totalNetProfit);
+
+  const top1 = leaderboard[0];
+  const top2 = leaderboard[1];
+  const top3 = leaderboard[2];
+  const others = leaderboard.slice(3);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <History className="w-6 h-6 text-zinc-600" />
         <h2 className="text-2xl font-bold">Lịch sử trận đấu</h2>
       </div>
+
+      {/* Leaderboard Card */}
+      {leaderboard.length > 0 && (
+        <Card className="border-zinc-300 overflow-hidden shadow-md">
+          <div 
+            onClick={() => setShowLeaderboard(!showLeaderboard)}
+            className="bg-zinc-100 px-4 py-3 border-b border-zinc-300 flex justify-between items-center cursor-pointer hover:bg-zinc-200/70 transition-colors select-none"
+          >
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-yellow-600" />
+              <span className="font-black text-sm uppercase tracking-wider text-zinc-950">Bảng Xếp Hạng Player</span>
+            </div>
+            <div className="text-zinc-500">
+              {showLeaderboard ? (
+                <ChevronUp className="w-5 h-5" />
+              ) : (
+                <ChevronDown className="w-5 h-5" />
+              )}
+            </div>
+          </div>
+
+          {showLeaderboard && (
+            <div className="p-4 sm:p-6 bg-white transition-all duration-300">
+              {/* Podium */}
+              <div className="flex flex-col items-center justify-end pt-6 pb-4 border-b border-zinc-100">
+                <div className="flex items-end justify-center w-full max-w-sm sm:max-w-md gap-2 sm:gap-4 h-56 sm:h-64 mx-auto">
+                  
+                  {/* Top 2 Stand */}
+                  <div className="flex flex-col items-center flex-1 transition-all duration-300 hover:-translate-y-1">
+                    {top2 ? (
+                      <>
+                        <div className="text-center mb-1.5 w-full">
+                          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-zinc-100 border border-zinc-300 flex items-center justify-center font-bold text-zinc-700 shadow relative mx-auto">
+                            <span className="font-bold text-sm sm:text-base">{getInitials(top2.name)}</span>
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-zinc-400 text-white rounded-full p-0.5 shadow-sm">
+                              <Medal className="w-3.5 h-3.5 text-zinc-100" />
+                            </div>
+                          </div>
+                          <div className="font-bold text-xs sm:text-sm text-zinc-800 mt-1 truncate px-1 max-w-[80px] sm:max-w-[110px] mx-auto" title={top2.name}>
+                            {top2.name}
+                          </div>
+                          <div className={`text-xs font-black ${getProfitColor(top2.totalNetProfit)}`}>
+                            {formatChips(top2.totalNetProfit)}
+                          </div>
+                        </div>
+                        <div className="w-full bg-gradient-to-t from-zinc-200 to-zinc-50 border-t border-zinc-300 rounded-t-lg h-20 sm:h-24 flex flex-col items-center justify-center shadow-sm">
+                          <span className="text-xl sm:text-2xl font-black text-zinc-400">2</span>
+                          <span className="text-[9px] sm:text-[10px] text-zinc-400 font-bold">{top2.gamesPlayed} trận</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="w-full h-20 sm:h-24 bg-zinc-50 border border-dashed border-zinc-200 rounded-t-lg flex flex-col items-center justify-center text-zinc-300">
+                        <span className="text-xl font-bold">2</span>
+                        <span className="text-[8px] uppercase tracking-wider font-bold">Trống</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Top 1 Stand */}
+                  <div className="flex flex-col items-center flex-1 transition-all duration-300 hover:-translate-y-1">
+                    {top1 ? (
+                      <>
+                        <div className="text-center mb-1.5 w-full">
+                          <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-amber-50 border-2 border-amber-400 flex items-center justify-center font-black text-amber-800 shadow-md relative mx-auto">
+                            <span className="font-black text-base sm:text-lg">{getInitials(top1.name)}</span>
+                            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-950 rounded-full p-0.5 shadow">
+                              <Crown className="w-4 h-4" />
+                            </div>
+                          </div>
+                          <div className="font-black text-xs sm:text-base text-zinc-900 mt-1 truncate px-1 max-w-[90px] sm:max-w-[120px] mx-auto" title={top1.name}>
+                            {top1.name}
+                          </div>
+                          <div className={`text-xs sm:text-sm font-black ${getProfitColor(top1.totalNetProfit)}`}>
+                            {formatChips(top1.totalNetProfit)}
+                          </div>
+                        </div>
+                        <div className="w-full bg-gradient-to-t from-yellow-400 to-yellow-100 border-t border-yellow-500 rounded-t-lg h-26 sm:h-32 flex flex-col items-center justify-center shadow relative overflow-hidden">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.35),transparent)] animate-pulse"></div>
+                          <span className="text-2xl sm:text-3xl font-black text-yellow-700 relative z-10">1</span>
+                          <span className="text-[9px] sm:text-[10px] text-yellow-800 font-bold relative z-10">{top1.gamesPlayed} trận</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="w-full h-26 sm:h-32 bg-zinc-50 border border-dashed border-zinc-200 rounded-t-lg flex flex-col items-center justify-center text-zinc-300">
+                        <span className="text-2xl font-bold">1</span>
+                        <span className="text-[8px] uppercase tracking-wider font-bold">Trống</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Top 3 Stand */}
+                  <div className="flex flex-col items-center flex-1 transition-all duration-300 hover:-translate-y-1">
+                    {top3 ? (
+                      <>
+                        <div className="text-center mb-1.5 w-full">
+                          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center font-bold text-orange-950 shadow relative mx-auto">
+                            <span className="font-bold text-sm sm:text-base">{getInitials(top3.name)}</span>
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-orange-400 text-orange-950 rounded-full p-0.5 shadow-sm">
+                              <Medal className="w-3.5 h-3.5" />
+                            </div>
+                          </div>
+                          <div className="font-bold text-xs sm:text-sm text-zinc-800 mt-1 truncate px-1 max-w-[80px] sm:max-w-[110px] mx-auto" title={top3.name}>
+                            {top3.name}
+                          </div>
+                          <div className={`text-xs font-black ${getProfitColor(top3.totalNetProfit)}`}>
+                            {formatChips(top3.totalNetProfit)}
+                          </div>
+                        </div>
+                        <div className="w-full bg-gradient-to-t from-orange-200 to-orange-100 border-t border-orange-300 rounded-t-lg h-16 sm:h-20 flex flex-col items-center justify-center shadow-sm">
+                          <span className="text-xl sm:text-2xl font-black text-orange-700/80">3</span>
+                          <span className="text-[9px] sm:text-[10px] text-orange-700/80 font-bold">{top3.gamesPlayed} trận</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="w-full h-16 sm:h-20 bg-zinc-50 border border-dashed border-zinc-200 rounded-t-lg flex flex-col items-center justify-center text-zinc-300">
+                        <span className="text-lg font-bold">3</span>
+                        <span className="text-[8px] uppercase tracking-wider font-bold">Trống</span>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Rank 4+ List */}
+              {others.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">Danh sách xếp hạng tiếp theo</h4>
+                  <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
+                    {others.map((player, idx) => {
+                      const rank = idx + 4;
+                      return (
+                        <div key={player.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 transition-colors">
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-5 text-center font-bold text-zinc-400 text-xs">#{rank}</span>
+                            <div className="w-7 h-7 rounded-full bg-zinc-200 border border-zinc-300 flex items-center justify-center font-bold text-zinc-600 text-xs shrink-0">
+                              {getInitials(player.name)}
+                            </div>
+                            <div>
+                              <span className="font-bold text-zinc-900 block text-xs sm:text-sm">{player.name}</span>
+                              <span className="text-[9px] text-zinc-500 font-medium">{player.gamesPlayed} trận</span>
+                            </div>
+                          </div>
+                          
+                          <div className={`font-mono font-bold text-xs sm:text-sm ${getProfitColor(player.totalNetProfit)}`}>
+                            {formatChips(player.totalNetProfit)} chip
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+      )}
 
       <div className="space-y-6">
         {sortedHistory.map((game) => {
