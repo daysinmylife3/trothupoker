@@ -7,34 +7,97 @@ const ACTIVE_GAME_KEY = 'poker_active_game';
 
 export const storage = {
   getPlayers: (): Player[] => {
-    const data = Cookies.get(ROSTER_KEY);
-    return data ? JSON.parse(data) : [];
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem(ROSTER_KEY);
+      if (localData) return JSON.parse(localData);
+    }
+    const cookieData = Cookies.get(ROSTER_KEY);
+    if (cookieData) {
+      try {
+        const players = JSON.parse(cookieData);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(ROSTER_KEY, cookieData);
+        }
+        Cookies.remove(ROSTER_KEY);
+        return players;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return [];
   },
   savePlayers: (players: Player[]) => {
-    Cookies.set(ROSTER_KEY, JSON.stringify(players), { expires: 365 });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ROSTER_KEY, JSON.stringify(players));
+    }
   },
   getHistory: (): Game[] => {
-    const data = Cookies.get(HISTORY_KEY);
-    return data ? JSON.parse(data) : [];
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem(HISTORY_KEY);
+      if (localData) return JSON.parse(localData);
+    }
+    const cookieData = Cookies.get(HISTORY_KEY);
+    if (cookieData) {
+      try {
+        const history = JSON.parse(cookieData);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(HISTORY_KEY, cookieData);
+        }
+        Cookies.remove(HISTORY_KEY);
+        return history;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return [];
   },
   saveHistory: (history: Game[]) => {
-    Cookies.set(HISTORY_KEY, JSON.stringify(history), { expires: 365 });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    }
   },
   deleteHistoryItem: (id: string) => {
-    const data = Cookies.get(HISTORY_KEY);
-    if (!data) return;
-    const history: Game[] = JSON.parse(data);
-    const updated = history.filter(g => g.id !== id);
-    Cookies.set(HISTORY_KEY, JSON.stringify(updated), { expires: 365 });
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem(HISTORY_KEY);
+      if (localData) {
+        try {
+          const history: Game[] = JSON.parse(localData);
+          const updated = history.filter(g => g.id !== id);
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
   },
   getActiveGame: (): Game | null => {
-    const data = Cookies.get(ACTIVE_GAME_KEY);
-    return data ? JSON.parse(data) : null;
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem(ACTIVE_GAME_KEY);
+      if (localData) return JSON.parse(localData);
+    }
+    const cookieData = Cookies.get(ACTIVE_GAME_KEY);
+    if (cookieData) {
+      try {
+        const game = JSON.parse(cookieData);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(ACTIVE_GAME_KEY, cookieData);
+        }
+        Cookies.remove(ACTIVE_GAME_KEY);
+        return game;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return null;
   },
   saveActiveGame: (game: Game) => {
-    Cookies.set(ACTIVE_GAME_KEY, JSON.stringify(game), { expires: 7 });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ACTIVE_GAME_KEY, JSON.stringify(game));
+    }
   },
   clearActiveGame: () => {
-    Cookies.remove(ACTIVE_GAME_KEY);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(ACTIVE_GAME_KEY);
+    }
   }
 };

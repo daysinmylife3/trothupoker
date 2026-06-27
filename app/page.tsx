@@ -164,7 +164,7 @@ export default function Home() {
       </main>
 
       <footer className="py-8 text-center text-zinc-400 text-xs border-t border-zinc-200 bg-white mt-auto">
-        &copy; {new Date().getFullYear()} Quản lý Poker. Tất cả dữ liệu được lưu trong cookies.
+        &copy; {new Date().getFullYear()} Quản lý Poker. Tất cả dữ liệu được lưu trong trình duyệt.
       </footer>
     </div>
   );
