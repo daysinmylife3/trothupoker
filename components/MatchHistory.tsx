@@ -24,15 +24,17 @@ import {
 interface MatchHistoryProps {
   history: Game[];
   roster?: Player[];
+  onUpdateRoster?: (updatedRoster: Player[]) => void;
   onDelete: (id: string) => void;
   onUpdate: (game: Game) => void;
 }
 
-export function MatchHistory({ history, roster = [], onDelete, onUpdate }: MatchHistoryProps) {
+export function MatchHistory({ history, roster = [], onUpdateRoster, onDelete, onUpdate }: MatchHistoryProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editProfits, setEditProfits] = useState<Record<string, number>>({});
   const [editChipValue, setEditChipValue] = useState<number>(500);
   const [showLeaderboard, setShowLeaderboard] = useState(true);
+  const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
 
   const sortedHistory = [...history].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -135,6 +137,17 @@ export function MatchHistory({ history, roster = [], onDelete, onUpdate }: Match
   const top3 = leaderboard[2];
   const others = leaderboard.slice(3);
 
+  const isRosterPlayer = (id: string) => roster.some(r => r.id === id);
+
+  const startEditingAvatar = (id: string, fallbackPlayer: { id: string; name: string; avatar?: string }) => {
+    const rosterPlayer = roster.find(r => r.id === id);
+    if (rosterPlayer) {
+      setEditingPlayer(rosterPlayer);
+    }
+  };
+
+  const FRUIT_AVATARS = ['🍉', '🥑', '🍌', '🍎', '🍇', '🍓', '🍒', '🍍', '🍊', '🍋', '🍑', '🥝', '🥭', '🍐', '🥥'];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -173,7 +186,13 @@ export function MatchHistory({ history, roster = [], onDelete, onUpdate }: Match
                     {top2 ? (
                       <>
                         <div className="text-center mb-1.5 w-full">
-                          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-zinc-100 border border-zinc-300 flex items-center justify-center font-bold text-zinc-700 shadow relative mx-auto">
+                          <div 
+                            onClick={() => isRosterPlayer(top2.id) && startEditingAvatar(top2.id, top2)}
+                            className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-zinc-100 border border-zinc-300 flex items-center justify-center font-bold text-zinc-700 shadow relative mx-auto ${
+                              isRosterPlayer(top2.id) ? 'cursor-pointer hover:scale-105 hover:ring-2 hover:ring-blue-500/30 transition-all' : ''
+                            }`}
+                            title={isRosterPlayer(top2.id) ? "Click để đổi avatar" : ""}
+                          >
                             {top2.avatar ? (
                               <span className="text-xl sm:text-2xl">{top2.avatar}</span>
                             ) : (
@@ -208,7 +227,13 @@ export function MatchHistory({ history, roster = [], onDelete, onUpdate }: Match
                     {top1 ? (
                       <>
                         <div className="text-center mb-1.5 w-full">
-                          <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-amber-50 border-2 border-amber-400 flex items-center justify-center font-black text-amber-800 shadow-md relative mx-auto">
+                          <div 
+                            onClick={() => isRosterPlayer(top1.id) && startEditingAvatar(top1.id, top1)}
+                            className={`w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-amber-50 border-2 border-amber-400 flex items-center justify-center font-black text-amber-800 shadow-md relative mx-auto ${
+                              isRosterPlayer(top1.id) ? 'cursor-pointer hover:scale-105 hover:ring-2 hover:ring-blue-500/30 transition-all' : ''
+                            }`}
+                            title={isRosterPlayer(top1.id) ? "Click để đổi avatar" : ""}
+                          >
                             {top1.avatar ? (
                               <span className="text-2xl sm:text-3xl">{top1.avatar}</span>
                             ) : (
@@ -244,7 +269,13 @@ export function MatchHistory({ history, roster = [], onDelete, onUpdate }: Match
                     {top3 ? (
                       <>
                         <div className="text-center mb-1.5 w-full">
-                          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center font-bold text-orange-950 shadow relative mx-auto">
+                          <div 
+                            onClick={() => isRosterPlayer(top3.id) && startEditingAvatar(top3.id, top3)}
+                            className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center font-bold text-orange-950 shadow relative mx-auto ${
+                              isRosterPlayer(top3.id) ? 'cursor-pointer hover:scale-105 hover:ring-2 hover:ring-blue-500/30 transition-all' : ''
+                            }`}
+                            title={isRosterPlayer(top3.id) ? "Click để đổi avatar" : ""}
+                          >
                             {top3.avatar ? (
                               <span className="text-xl sm:text-2xl">{top3.avatar}</span>
                             ) : (
@@ -288,7 +319,13 @@ export function MatchHistory({ history, roster = [], onDelete, onUpdate }: Match
                         <div key={player.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 transition-colors">
                           <div className="flex items-center gap-2.5">
                             <span className="w-5 text-center font-bold text-zinc-400 text-xs">#{rank}</span>
-                            <div className="w-7 h-7 rounded-full bg-zinc-200 border border-zinc-300 flex items-center justify-center font-bold text-zinc-600 text-xs shrink-0 shadow-sm">
+                            <div 
+                              onClick={() => isRosterPlayer(player.id) && startEditingAvatar(player.id, player)}
+                              className={`w-7 h-7 rounded-full bg-zinc-200 border border-zinc-300 flex items-center justify-center font-bold text-zinc-600 text-xs shrink-0 shadow-sm ${
+                                isRosterPlayer(player.id) ? 'cursor-pointer hover:scale-105 hover:ring-2 hover:ring-blue-500/30 transition-all' : ''
+                              }`}
+                              title={isRosterPlayer(player.id) ? "Click để đổi avatar" : ""}
+                            >
                               {player.avatar ? (
                                 <span className="text-base">{player.avatar}</span>
                               ) : (
@@ -489,6 +526,56 @@ export function MatchHistory({ history, roster = [], onDelete, onUpdate }: Match
           </div>
         )}
       </div>
+
+      {/* Avatar Edit Modal */}
+      {editingPlayer && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <Card className="w-full max-w-sm p-6 bg-white border border-zinc-200 shadow-2xl relative">
+            <button 
+              onClick={() => setEditingPlayer(null)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="space-y-4">
+              <div className="text-center">
+                <h3 className="text-lg font-black text-zinc-950">Thay đổi Avatar</h3>
+                <p className="text-xs font-bold text-zinc-500 mt-1">Đang chọn cho người chơi: <span className="text-zinc-800 font-extrabold">{editingPlayer.name}</span></p>
+              </div>
+              
+              <div className="grid grid-cols-5 gap-2.5 justify-items-center py-2">
+                {FRUIT_AVATARS.map((fruit) => {
+                  const isSelected = editingPlayer.avatar === fruit;
+                  return (
+                    <button
+                      key={fruit}
+                      onClick={() => {
+                        if (onUpdateRoster) {
+                          const updatedRoster = roster.map(p => 
+                            p.id === editingPlayer.id ? { ...p, avatar: fruit } : p
+                          );
+                          onUpdateRoster(updatedRoster);
+                        }
+                        
+                        setEditingPlayer(prev => prev ? { ...prev, avatar: fruit } : null);
+                        setTimeout(() => setEditingPlayer(null), 200);
+                      }}
+                      className={`w-11 h-11 text-2xl rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                        isSelected 
+                          ? 'border-blue-500 bg-blue-50/50 scale-110 shadow-sm ring-2 ring-blue-500/20' 
+                          : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                      }`}
+                    >
+                      {fruit}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
