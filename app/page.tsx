@@ -88,8 +88,8 @@ export default function Home() {
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-blue-600">
-            <Spade className="w-6 h-6 fill-current" />
-            POKER SETTLE
+            <span className="text-2xl shrink-0">🍚</span>
+            NỒI CƠM CỦA XUÂN BÁCH
           </div>
           
           <nav className="flex gap-1">
@@ -168,7 +168,7 @@ export default function Home() {
       </main>
 
       <footer className="py-8 text-center text-zinc-400 text-xs border-t border-zinc-200 bg-white mt-auto">
-        &copy; {new Date().getFullYear()} Quản lý Poker. Tất cả dữ liệu được lưu trong trình duyệt.
+        &copy; {new Date().getFullYear()} Nồi cơm của Xuân Bách. Tất cả dữ liệu được lưu trong trình duyệt.
       </footer>
     </div>
   );
