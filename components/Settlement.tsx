@@ -112,11 +112,16 @@ export function Settlement({ game, onBack, onSave }: SettlementProps) {
           const profit = remaining - player.buyIn;
           return (
             <Card key={player.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-4 border-zinc-300">
-              <div className="flex-1 min-w-0">
-                <div className="font-black text-xl truncate text-zinc-950">{player.name}</div>
-                <div className="text-sm text-zinc-700 font-bold flex justify-between sm:justify-start sm:gap-4">
-                  <span>Đã mua: {player.buyIn}</span>
-                  <span className="text-zinc-400">({formatMoney(player.buyIn)})</span>
+              <div className="flex-1 min-w-0 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center border border-zinc-200 shrink-0 text-2xl shadow-sm">
+                  {player.avatar || '👤'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-black text-xl truncate text-zinc-950" title={player.name}>{player.name}</div>
+                  <div className="text-sm text-zinc-700 font-bold flex justify-between sm:justify-start sm:gap-4">
+                    <span>Đã mua: {player.buyIn}</span>
+                    <span className="text-zinc-400">({formatMoney(player.buyIn)})</span>
+                  </div>
                 </div>
               </div>
               

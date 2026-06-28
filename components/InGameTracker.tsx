@@ -33,8 +33,11 @@ export function InGameTracker({ game, onUpdate, onEnd }: InGameTrackerProps) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {game.players.map((player) => (
           <Card key={player.id} className="p-5 space-y-4 border-zinc-300">
-            <div className="flex justify-between items-start">
-              <h3 className="font-bold text-xl truncate pr-2 text-zinc-950">{player.name}</h3>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2 min-w-0 pr-2">
+                <span className="text-2xl shrink-0">{player.avatar || '👤'}</span>
+                <h3 className="font-bold text-xl truncate text-zinc-950" title={player.name}>{player.name}</h3>
+              </div>
               <div className="bg-zinc-200 px-2 py-1 rounded text-sm font-mono font-black text-zinc-950">
                 {player.buyIn}
               </div>
