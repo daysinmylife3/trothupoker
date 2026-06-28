@@ -11,11 +11,13 @@ interface RosterManagerProps {
 }
 
 const FRUIT_AVATARS = ['🍉', '🥑', '🍌', '🍎', '🍇', '🍓', '🍒', '🍍', '🍊', '🍋', '🍑', '🥝', '🥭', '🍐', '🥥'];
+const ANIMAL_AVATARS = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐣', '🦆'];
+const ALL_AVATARS = [...FRUIT_AVATARS, ...ANIMAL_AVATARS];
 
 export function RosterManager({ players, onUpdate }: RosterManagerProps) {
   const [newName, setNewName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(() => {
-    return FRUIT_AVATARS[Math.floor(Math.random() * FRUIT_AVATARS.length)];
+    return ALL_AVATARS[Math.floor(Math.random() * ALL_AVATARS.length)];
   });
 
   const addPlayer = () => {
@@ -28,13 +30,13 @@ export function RosterManager({ players, onUpdate }: RosterManagerProps) {
     onUpdate([...players, newPlayer]);
     setNewName('');
 
-    // Choose an unused fruit for the next player
+    // Choose an unused icon for the next player
     const usedAvatars = [...players, newPlayer].map(p => p.avatar).filter(Boolean);
-    const unused = FRUIT_AVATARS.filter(f => !usedAvatars.includes(f));
-    const nextFruit = unused.length > 0 
+    const unused = ALL_AVATARS.filter(f => !usedAvatars.includes(f));
+    const nextAvatar = unused.length > 0 
       ? unused[Math.floor(Math.random() * unused.length)] 
-      : FRUIT_AVATARS[Math.floor(Math.random() * FRUIT_AVATARS.length)];
-    setSelectedAvatar(nextFruit);
+      : ALL_AVATARS[Math.floor(Math.random() * ALL_AVATARS.length)];
+    setSelectedAvatar(nextAvatar);
   };
 
   const removePlayer = (id: string) => {
@@ -63,26 +65,53 @@ export function RosterManager({ players, onUpdate }: RosterManagerProps) {
           </Button>
         </div>
 
-        <div className="space-y-2">
-          <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Chọn Icon Đại Diện (Trái Cây)</span>
-          <div className="flex flex-wrap gap-2">
-            {FRUIT_AVATARS.map((fruit) => {
-              const isSelected = selectedAvatar === fruit;
-              return (
-                <button
-                  key={fruit}
-                  type="button"
-                  onClick={() => setSelectedAvatar(fruit)}
-                  className={`w-10 h-10 text-xl rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
-                    isSelected 
-                      ? 'border-blue-500 bg-blue-50/50 scale-110 shadow-sm ring-2 ring-blue-500/20' 
-                      : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
-                  }`}
-                >
-                  {fruit}
-                </button>
-              );
-            })}
+        <div className="space-y-3">
+          <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Chọn Icon Đại Diện</span>
+          
+          <div className="space-y-1.5">
+            <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Trái Cây</div>
+            <div className="flex flex-wrap gap-1.5">
+              {FRUIT_AVATARS.map((fruit) => {
+                const isSelected = selectedAvatar === fruit;
+                return (
+                  <button
+                    key={fruit}
+                    type="button"
+                    onClick={() => setSelectedAvatar(fruit)}
+                    className={`w-9 h-9 text-lg rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'border-blue-500 bg-blue-50/50 scale-110 shadow-sm ring-2 ring-blue-500/20' 
+                        : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                    }`}
+                  >
+                    {fruit}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Động Vật</div>
+            <div className="flex flex-wrap gap-1.5">
+              {ANIMAL_AVATARS.map((animal) => {
+                const isSelected = selectedAvatar === animal;
+                return (
+                  <button
+                    key={animal}
+                    type="button"
+                    onClick={() => setSelectedAvatar(animal)}
+                    className={`w-9 h-9 text-lg rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'border-blue-500 bg-blue-50/50 scale-110 shadow-sm ring-2 ring-blue-500/20' 
+                        : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                    }`}
+                  >
+                    {animal}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

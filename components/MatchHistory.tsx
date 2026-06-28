@@ -147,6 +147,7 @@ export function MatchHistory({ history, roster = [], onUpdateRoster, onDelete, o
   };
 
   const FRUIT_AVATARS = ['🍉', '🥑', '🍌', '🍎', '🍇', '🍓', '🍒', '🍍', '🍊', '🍋', '🍑', '🥝', '🥭', '🍐', '🥥'];
+  const ANIMAL_AVATARS = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐣', '🦆'];
 
   return (
     <div className="space-y-6">
@@ -544,33 +545,68 @@ export function MatchHistory({ history, roster = [], onUpdateRoster, onDelete, o
                 <p className="text-xs font-bold text-zinc-500 mt-1">Đang chọn cho người chơi: <span className="text-zinc-800 font-extrabold">{editingPlayer.name}</span></p>
               </div>
               
-              <div className="grid grid-cols-5 gap-2.5 justify-items-center py-2">
-                {FRUIT_AVATARS.map((fruit) => {
-                  const isSelected = editingPlayer.avatar === fruit;
-                  return (
-                    <button
-                      key={fruit}
-                      onClick={() => {
-                        if (onUpdateRoster) {
-                          const updatedRoster = roster.map(p => 
-                            p.id === editingPlayer.id ? { ...p, avatar: fruit } : p
-                          );
-                          onUpdateRoster(updatedRoster);
-                        }
-                        
-                        setEditingPlayer(prev => prev ? { ...prev, avatar: fruit } : null);
-                        setTimeout(() => setEditingPlayer(null), 200);
-                      }}
-                      className={`w-11 h-11 text-2xl rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
-                        isSelected 
-                          ? 'border-blue-500 bg-blue-50/50 scale-110 shadow-sm ring-2 ring-blue-500/20' 
-                          : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
-                      }`}
-                    >
-                      {fruit}
-                    </button>
-                  );
-                })}
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                <div className="space-y-1">
+                  <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Trái Cây</div>
+                  <div className="grid grid-cols-5 gap-2 justify-items-center">
+                    {FRUIT_AVATARS.map((fruit) => {
+                      const isSelected = editingPlayer.avatar === fruit;
+                      return (
+                        <button
+                          key={fruit}
+                          onClick={() => {
+                            if (onUpdateRoster) {
+                              const updatedRoster = roster.map(p => 
+                                p.id === editingPlayer.id ? { ...p, avatar: fruit } : p
+                              );
+                              onUpdateRoster(updatedRoster);
+                            }
+                            setEditingPlayer(prev => prev ? { ...prev, avatar: fruit } : null);
+                            setTimeout(() => setEditingPlayer(null), 200);
+                          }}
+                          className={`w-10 h-10 text-xl rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                            isSelected 
+                              ? 'border-blue-500 bg-blue-50/50 scale-110 shadow-sm ring-2 ring-blue-500/20' 
+                              : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                          }`}
+                        >
+                          {fruit}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Động Vật</div>
+                  <div className="grid grid-cols-5 gap-2 justify-items-center">
+                    {ANIMAL_AVATARS.map((animal) => {
+                      const isSelected = editingPlayer.avatar === animal;
+                      return (
+                        <button
+                          key={animal}
+                          onClick={() => {
+                            if (onUpdateRoster) {
+                              const updatedRoster = roster.map(p => 
+                                p.id === editingPlayer.id ? { ...p, avatar: animal } : p
+                              );
+                              onUpdateRoster(updatedRoster);
+                            }
+                            setEditingPlayer(prev => prev ? { ...prev, avatar: animal } : null);
+                            setTimeout(() => setEditingPlayer(null), 200);
+                          }}
+                          className={`w-10 h-10 text-xl rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                            isSelected 
+                              ? 'border-blue-500 bg-blue-50/50 scale-110 shadow-sm ring-2 ring-blue-500/20' 
+                              : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                          }`}
+                        >
+                          {animal}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </Card>
