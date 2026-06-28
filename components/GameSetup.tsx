@@ -67,9 +67,12 @@ export function GameSetup({ roster, lastSelectedIds, onStart }: GameSetupProps) 
               onClick={() => togglePlayer(player.id)}
             >
               <div className="flex items-center justify-between">
-                <span className={`font-bold ${isSelected ? 'text-blue-900' : 'text-zinc-950'}`}>
-                  {player.name}
-                </span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-lg shrink-0">{player.avatar || '👤'}</span>
+                  <span className={`font-bold truncate ${isSelected ? 'text-blue-900' : 'text-zinc-950'}`}>
+                    {player.name}
+                  </span>
+                </div>
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                   isSelected ? 'bg-blue-600 border-blue-600' : 'border-zinc-400'
                 }`}>

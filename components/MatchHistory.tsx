@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Game } from '../types/poker';
+import { Game, Player } from '../types/poker';
 import { Card, Button, Input } from './ui';
 import { 
   History, 
@@ -23,11 +23,12 @@ import {
 
 interface MatchHistoryProps {
   history: Game[];
+  roster?: Player[];
   onDelete: (id: string) => void;
   onUpdate: (game: Game) => void;
 }
 
-export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps) {
+export function MatchHistory({ history, roster = [], onDelete, onUpdate }: MatchHistoryProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editProfits, setEditProfits] = useState<Record<string, number>>({});
   const [editChipValue, setEditChipValue] = useState<number>(500);
@@ -108,15 +109,26 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
             name: p.name,
             totalNetProfit: 0,
             gamesPlayed: 0,
+            avatar: p.avatar,
           };
         }
         acc[p.id].totalNetProfit += (p.netProfit || 0);
         acc[p.id].gamesPlayed += 1;
         acc[p.id].name = p.name; // Keep name fresh
+        if (p.avatar) {
+          acc[p.id].avatar = p.avatar; // Keep avatar fresh
+        }
       });
       return acc;
-    }, {} as Record<string, { id: string; name: string; totalNetProfit: number; gamesPlayed: number }>)
-  ).sort((a, b) => b.totalNetProfit - a.totalNetProfit);
+    }, {} as Record<string, { id: string; name: string; totalNetProfit: number; gamesPlayed: number; avatar?: string }>)
+  ).map(item => {
+    // Override avatar with current roster avatar if exists
+    const rosterPlayer = roster.find(r => r.id === item.id);
+    return {
+      ...item,
+      avatar: rosterPlayer?.avatar || item.avatar,
+    };
+  }).sort((a, b) => b.totalNetProfit - a.totalNetProfit);
 
   const top1 = leaderboard[0];
   const top2 = leaderboard[1];
@@ -162,7 +174,11 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
                       <>
                         <div className="text-center mb-1.5 w-full">
                           <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-zinc-100 border border-zinc-300 flex items-center justify-center font-bold text-zinc-700 shadow relative mx-auto">
-                            <span className="font-bold text-sm sm:text-base">{getInitials(top2.name)}</span>
+                            {top2.avatar ? (
+                              <span className="text-xl sm:text-2xl">{top2.avatar}</span>
+                            ) : (
+                              <span className="font-bold text-sm sm:text-base">{getInitials(top2.name)}</span>
+                            )}
                             <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-zinc-400 text-white rounded-full p-0.5 shadow-sm">
                               <Medal className="w-3.5 h-3.5 text-zinc-100" />
                             </div>
@@ -193,7 +209,11 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
                       <>
                         <div className="text-center mb-1.5 w-full">
                           <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-amber-50 border-2 border-amber-400 flex items-center justify-center font-black text-amber-800 shadow-md relative mx-auto">
-                            <span className="font-black text-base sm:text-lg">{getInitials(top1.name)}</span>
+                            {top1.avatar ? (
+                              <span className="text-2xl sm:text-3xl">{top1.avatar}</span>
+                            ) : (
+                              <span className="font-black text-base sm:text-lg">{getInitials(top1.name)}</span>
+                            )}
                             <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-950 rounded-full p-0.5 shadow">
                               <Crown className="w-4 h-4" />
                             </div>
@@ -225,7 +245,11 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
                       <>
                         <div className="text-center mb-1.5 w-full">
                           <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center font-bold text-orange-950 shadow relative mx-auto">
-                            <span className="font-bold text-sm sm:text-base">{getInitials(top3.name)}</span>
+                            {top3.avatar ? (
+                              <span className="text-xl sm:text-2xl">{top3.avatar}</span>
+                            ) : (
+                              <span className="font-bold text-sm sm:text-base">{getInitials(top3.name)}</span>
+                            )}
                             <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-orange-400 text-orange-950 rounded-full p-0.5 shadow-sm">
                               <Medal className="w-3.5 h-3.5" />
                             </div>
@@ -264,8 +288,12 @@ export function MatchHistory({ history, onDelete, onUpdate }: MatchHistoryProps)
                         <div key={player.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 transition-colors">
                           <div className="flex items-center gap-2.5">
                             <span className="w-5 text-center font-bold text-zinc-400 text-xs">#{rank}</span>
-                            <div className="w-7 h-7 rounded-full bg-zinc-200 border border-zinc-300 flex items-center justify-center font-bold text-zinc-600 text-xs shrink-0">
-                              {getInitials(player.name)}
+                            <div className="w-7 h-7 rounded-full bg-zinc-200 border border-zinc-300 flex items-center justify-center font-bold text-zinc-600 text-xs shrink-0 shadow-sm">
+                              {player.avatar ? (
+                                <span className="text-base">{player.avatar}</span>
+                              ) : (
+                                <span>{getInitials(player.name)}</span>
+                              )}
                             </div>
                             <div>
                               <span className="font-bold text-zinc-900 block text-xs sm:text-sm">{player.name}</span>

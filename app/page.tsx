@@ -157,6 +157,7 @@ export default function Home() {
         {view === 'history' && (
           <MatchHistory 
             history={history} 
+            roster={roster}
             onDelete={handleDeleteHistory} 
             onUpdate={handleUpdateHistory}
           />
