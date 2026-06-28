@@ -1,17 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { Game, GamePlayer } from '../types/poker';
+import { Game, GamePlayer, Player } from '../types/poker';
 import { Button, Card, Input } from './ui';
 import { Calculator, ArrowLeft, Save, AlertCircle, Banknote } from 'lucide-react';
 
 interface SettlementProps {
   game: Game;
+  roster?: Player[];
   onBack: () => void;
   onSave: (finalGame: Game) => void;
 }
 
-export function Settlement({ game, onBack, onSave }: SettlementProps) {
+export function Settlement({ game, roster = [], onBack, onSave }: SettlementProps) {
   const [remainingChips, setRemainingChips] = useState<Record<string, number>>(
     Object.fromEntries(game.players.map(p => [p.id, 0]))
   );
@@ -28,8 +29,10 @@ export function Settlement({ game, onBack, onSave }: SettlementProps) {
   const handleSave = () => {
     const settledPlayers: GamePlayer[] = game.players.map(p => {
       const remaining = remainingChips[p.id] || 0;
+      const rosterPlayer = roster.find(r => r.id === p.id);
       return {
         ...p,
+        avatar: rosterPlayer?.avatar || p.avatar,
         remainingChips: remaining,
         netProfit: remaining - p.buyIn,
       };
@@ -110,11 +113,13 @@ export function Settlement({ game, onBack, onSave }: SettlementProps) {
         {game.players.map((player) => {
           const remaining = remainingChips[player.id] || 0;
           const profit = remaining - player.buyIn;
+          const rosterPlayer = roster.find(r => r.id === player.id);
+          const avatar = rosterPlayer?.avatar || player.avatar || '👤';
           return (
             <Card key={player.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-4 border-zinc-300">
               <div className="flex-1 min-w-0 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center border border-zinc-200 shrink-0 text-2xl shadow-sm">
-                  {player.avatar || '👤'}
+                  {avatar}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-black text-xl truncate text-zinc-950" title={player.name}>{player.name}</div>

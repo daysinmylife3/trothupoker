@@ -1,16 +1,17 @@
 'use client';
 
-import { Game } from '../types/poker';
+import { Game, Player } from '../types/poker';
 import { Button, Card, Input } from './ui';
 import { Plus, Minus, CheckCheck, Coins } from 'lucide-react';
 
 interface InGameTrackerProps {
   game: Game;
+  roster?: Player[];
   onUpdate: (game: Game) => void;
   onEnd: () => void;
 }
 
-export function InGameTracker({ game, onUpdate, onEnd }: InGameTrackerProps) {
+export function InGameTracker({ game, roster = [], onUpdate, onEnd }: InGameTrackerProps) {
   const updatePlayerBuyIn = (id: string, newBuyIn: number) => {
     const updatedPlayers = game.players.map(p => 
       p.id === id ? { ...p, buyIn: newBuyIn } : p
@@ -31,13 +32,16 @@ export function InGameTracker({ game, onUpdate, onEnd }: InGameTrackerProps) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {game.players.map((player) => (
-          <Card key={player.id} className="p-5 space-y-4 border-zinc-300">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2 min-w-0 pr-2">
-                <span className="text-2xl shrink-0">{player.avatar || '👤'}</span>
-                <h3 className="font-bold text-xl truncate text-zinc-950" title={player.name}>{player.name}</h3>
-              </div>
+        {game.players.map((player) => {
+          const rosterPlayer = roster.find(r => r.id === player.id);
+          const avatar = rosterPlayer?.avatar || player.avatar || '👤';
+          return (
+            <Card key={player.id} className="p-5 space-y-4 border-zinc-300">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2 min-w-0 pr-2">
+                  <span className="text-2xl shrink-0">{avatar}</span>
+                  <h3 className="font-bold text-xl truncate text-zinc-950" title={player.name}>{player.name}</h3>
+                </div>
               <div className="bg-zinc-200 px-2 py-1 rounded text-sm font-mono font-black text-zinc-950">
                 {player.buyIn}
               </div>
@@ -82,7 +86,8 @@ export function InGameTracker({ game, onUpdate, onEnd }: InGameTrackerProps) {
               </div>
             </div>
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       <div className="pt-6">

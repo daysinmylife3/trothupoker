@@ -141,6 +141,7 @@ export default function Home() {
         {view === 'playing' && activeGame && (
           <InGameTracker 
             game={activeGame} 
+            roster={roster}
             onUpdate={handleUpdateGame} 
             onEnd={() => setView('settlement')} 
           />
@@ -149,6 +150,7 @@ export default function Home() {
         {view === 'settlement' && activeGame && (
           <Settlement 
             game={activeGame} 
+            roster={roster}
             onBack={() => setView('playing')} 
             onSave={handleSaveMatch} 
           />
