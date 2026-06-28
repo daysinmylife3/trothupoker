@@ -87,9 +87,11 @@ export default function Home() {
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-blue-600">
-            <span className="text-2xl shrink-0">🍚</span>
-            NỒI CƠM CỦA XUÂN BÁCH
+          <div className="flex items-center gap-2 font-black text-xl tracking-tight">
+            <span className="text-2xl shrink-0 animate-bounce" style={{ animationDuration: '3s' }}>🍚</span>
+            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">
+              Nồi cơm của Xuân Bách
+            </span>
           </div>
           
           <nav className="flex gap-1">
