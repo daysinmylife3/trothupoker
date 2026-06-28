@@ -158,6 +158,7 @@ export default function Home() {
           <MatchHistory 
             history={history} 
             roster={roster}
+            onUpdateRoster={handleUpdateRoster}
             onDelete={handleDeleteHistory} 
             onUpdate={handleUpdateHistory}
           />
