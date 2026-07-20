@@ -145,6 +145,7 @@ export default function Home() {
             game={activeGame} 
             roster={roster}
             onUpdate={handleUpdateGame} 
+            onUpdateRoster={handleUpdateRoster}
             onEnd={() => setView('settlement')} 
           />
         )}
