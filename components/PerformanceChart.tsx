@@ -9,7 +9,8 @@ import {
   Filter, 
   Eye, 
   EyeOff,
-  ChevronDown
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface PerformanceChartProps {
@@ -59,6 +60,8 @@ export function PerformanceChart({
     }
   };
 
+  // Collapse/expand state
+  const [showChart, setShowChart] = useState(true);
   // Hidden player set for legend toggling
   const [hiddenPlayerIds, setHiddenPlayerIds] = useState<Set<string>>(new Set());
   // Hovered point index for interactive tooltip
@@ -247,7 +250,10 @@ export function PerformanceChart({
   return (
     <Card className="border-zinc-300 overflow-hidden shadow-md">
       {/* Header */}
-      <div className="bg-zinc-100 px-4 py-3 border-b border-zinc-300 flex flex-wrap items-center justify-between gap-2 select-none">
+      <div 
+        onClick={() => setShowChart(!showChart)}
+        className="bg-zinc-100 px-4 py-3 border-b border-zinc-300 flex flex-wrap items-center justify-between gap-2 cursor-pointer hover:bg-zinc-200/70 transition-colors select-none"
+      >
         <div className="flex flex-wrap items-center gap-2">
           <LineChartIcon className="w-5 h-5 text-blue-600 shrink-0" />
           <span className="font-black text-sm uppercase tracking-wider text-zinc-950">
@@ -257,9 +263,17 @@ export function PerformanceChart({
             {getMonthLabel(selectedMonth)}
           </span>
         </div>
+        <div className="text-zinc-500">
+          {showChart ? (
+            <ChevronUp className="w-5 h-5" />
+          ) : (
+            <ChevronDown className="w-5 h-5" />
+          )}
+        </div>
       </div>
 
-      <div className="p-4 sm:p-6 bg-white space-y-4">
+      {showChart && (
+        <div className="p-4 sm:p-6 bg-white space-y-4">
         {/* Month selector control */}
         <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs font-bold text-zinc-700">
@@ -549,6 +563,7 @@ export function PerformanceChart({
           </div>
         )}
       </div>
+      )}
     </Card>
   );
 }
