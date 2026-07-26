@@ -18,8 +18,11 @@ import {
   Crown,
   Medal,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  CalendarDays,
+  Filter
 } from 'lucide-react';
+import { PerformanceChart } from './PerformanceChart';
 
 interface MatchHistoryProps {
   history: Game[];
@@ -101,9 +104,54 @@ export function MatchHistory({ history, roster = [], onUpdateRoster, onDelete, o
     return name.slice(0, 2).toUpperCase();
   };
 
-  // Compute leaderboard from history
+  // Month calculation for leaderboard
+  const getCurrentMonthKey = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+  };
+
+  const currentMonthKey = getCurrentMonthKey();
+  const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthKey);
+
+  // Extract unique available months (YYYY-MM) from history
+  const historyMonthKeys = Array.from(
+    new Set(
+      history.map(g => {
+        const d = new Date(g.date);
+        if (isNaN(d.getTime())) return '';
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        return `${y}-${m}`;
+      }).filter(Boolean)
+    )
+  );
+
+  const availableMonths = Array.from(
+    new Set([currentMonthKey, ...historyMonthKeys])
+  ).sort((a, b) => b.localeCompare(a));
+
+  const getMonthLabel = (key: string) => {
+    if (key === 'ALL') return 'Tất cả thời gian';
+    const [year, month] = key.split('-');
+    const isCurrent = key === currentMonthKey;
+    return `Tháng ${parseInt(month, 10)}/${year}${isCurrent ? ' (Tháng này)' : ''}`;
+  };
+
+  // Filter history for leaderboard based on selected month
+  const filteredLeaderboardHistory = history.filter(game => {
+    if (selectedMonth === 'ALL') return true;
+    const d = new Date(game.date);
+    if (isNaN(d.getTime())) return false;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}` === selectedMonth;
+  });
+
+  // Compute leaderboard from filtered history
   const leaderboard = Object.values(
-    history.reduce((acc, game) => {
+    filteredLeaderboardHistory.reduce((acc, game) => {
       game.players.forEach(p => {
         if (!acc[p.id]) {
           acc[p.id] = {
@@ -156,21 +204,26 @@ export function MatchHistory({ history, roster = [], onUpdateRoster, onDelete, o
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <History className="w-6 h-6 text-zinc-600" />
-        <h2 className="text-2xl font-bold">Lịch sử trận đấu</h2>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <History className="w-6 h-6 text-zinc-600" />
+          <h2 className="text-2xl font-bold">Lịch sử trận đấu</h2>
+        </div>
       </div>
 
       {/* Leaderboard Card */}
-      {leaderboard.length > 0 && (
+      {history.length > 0 && (
         <Card className="border-zinc-300 overflow-hidden shadow-md">
           <div 
             onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="bg-zinc-100 px-4 py-3 border-b border-zinc-300 flex justify-between items-center cursor-pointer hover:bg-zinc-200/70 transition-colors select-none"
+            className="bg-zinc-100 px-4 py-3 border-b border-zinc-300 flex flex-wrap items-center justify-between gap-2 cursor-pointer hover:bg-zinc-200/70 transition-colors select-none"
           >
-            <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-yellow-600" />
+            <div className="flex flex-wrap items-center gap-2">
+              <Trophy className="w-5 h-5 text-yellow-600 shrink-0" />
               <span className="font-black text-sm uppercase tracking-wider text-zinc-950">Bảng Xếp Hạng Player</span>
+              <span className="bg-yellow-500/10 text-yellow-800 text-[11px] font-extrabold px-2 py-0.5 rounded-full border border-yellow-500/30">
+                {getMonthLabel(selectedMonth)}
+              </span>
             </div>
             <div className="text-zinc-500">
               {showLeaderboard ? (
@@ -183,6 +236,83 @@ export function MatchHistory({ history, roster = [], onUpdateRoster, onDelete, o
 
           {showLeaderboard && (
             <div className="p-4 sm:p-6 bg-white transition-all duration-300">
+              {/* Month Filter Selector Bar */}
+              <div className="mb-6 p-3 bg-zinc-50 rounded-xl border border-zinc-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-zinc-700">
+                  <Filter className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>Thời gian xếp hạng:</span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMonth(currentMonthKey)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      selectedMonth === currentMonthKey
+                        ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/20'
+                        : 'bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-100'
+                    }`}
+                  >
+                    📅 Tháng hiện tại
+                  </button>
+
+                  <div className="relative inline-flex items-center flex-1 sm:flex-initial">
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      className={`w-full sm:w-auto pl-8 pr-7 py-1.5 border rounded-lg text-xs font-bold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer appearance-none ${
+                        selectedMonth !== currentMonthKey && selectedMonth !== 'ALL'
+                          ? 'bg-blue-50 border-blue-400 text-blue-900 ring-2 ring-blue-500/20'
+                          : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-100'
+                      }`}
+                    >
+                      {availableMonths.map(mKey => {
+                        const [y, m] = mKey.split('-');
+                        const isCurrent = mKey === currentMonthKey;
+                        return (
+                          <option key={mKey} value={mKey}>
+                            🗓️ Tháng {parseInt(m, 10)}/{y} {isCurrent ? '(Tháng này)' : ''}
+                          </option>
+                        );
+                      })}
+                      <option value="ALL">🏆 Tất cả thời gian</option>
+                    </select>
+                    <CalendarDays className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 pointer-events-none" />
+                    <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-2 pointer-events-none" />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMonth('ALL')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      selectedMonth === 'ALL'
+                        ? 'bg-amber-600 text-white shadow-sm ring-2 ring-amber-600/20'
+                        : 'bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-100'
+                    }`}
+                  >
+                    🏆 Tất cả
+                  </button>
+                </div>
+              </div>
+
+              {leaderboard.length === 0 ? (
+                <div className="py-12 text-center text-zinc-500 bg-zinc-50 rounded-xl border border-dashed border-zinc-200 my-2">
+                  <CalendarDays className="w-10 h-10 text-zinc-300 mx-auto mb-2" />
+                  <p className="font-bold text-sm text-zinc-700">Chưa có trận đấu nào trong {getMonthLabel(selectedMonth)}</p>
+                  <p className="text-xs text-zinc-400 mt-1">Hãy bắt đầu trận đấu mới hoặc chọn tháng khác để xem xếp hạng.</p>
+                  {selectedMonth !== 'ALL' && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setSelectedMonth('ALL')}
+                      className="mt-4 text-xs font-bold border-zinc-300 hover:bg-zinc-100"
+                    >
+                      Xem tất cả thời gian
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <>
               {/* Podium */}
               <div className="flex flex-col items-center justify-end pt-6 pb-4 border-b border-zinc-100">
                 <div className="flex items-end justify-center w-full max-w-sm sm:max-w-md gap-2 sm:gap-4 h-56 sm:h-64 mx-auto">
@@ -353,9 +483,21 @@ export function MatchHistory({ history, roster = [], onUpdateRoster, onDelete, o
                   </div>
                 </div>
               )}
-            </div>
+            </>
           )}
-        </Card>
+        </div>
+      )}
+    </Card>
+  )}
+
+      {/* Performance Line Chart */}
+      {history.length > 0 && (
+        <PerformanceChart 
+          history={history} 
+          roster={roster}
+          selectedMonth={selectedMonth}
+          onSelectMonth={setSelectedMonth}
+        />
       )}
 
       <div className="space-y-6">
